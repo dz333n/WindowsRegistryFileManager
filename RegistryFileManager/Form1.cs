@@ -5,16 +5,26 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace RegistryFileManager
 {
     public partial class Form1 : Form
     {
+        #region NET20_Things
+        public delegate void Action();
+        public delegate void Action<T1, T2>(T1 arg1, T2 arg2);
+        public delegate void Action<T1, T2, T3>(T1 arg1, T2 arg2, T3 arg3);
+        public delegate void Action<T1, T2, T3, T4>(T1 arg1, T2 arg2, T3 arg3, T4 arg4);
+        public delegate TResult Func<TResult>();
+        public delegate TResult Func<T, TResult>(T arg);
+        public delegate TResult Func<T1, T2, TResult>(T1 arg1, T2 arg2);
+        public delegate TResult Func<T1, T2, T3, TResult>(T1 arg1, T2 arg2, T3 arg3);
+        public delegate TResult Func<T1, T2, T3, T4, TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4);
+        #endregion
+
         public RegFiles Files = new RegFiles(Registry.CurrentUser.CreateSubKey("Software").CreateSubKey("Registry File Manager"));
 
         public Form1()
