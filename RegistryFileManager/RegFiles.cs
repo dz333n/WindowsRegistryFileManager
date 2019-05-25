@@ -13,11 +13,16 @@ namespace RegistryFileManager
     {
         public RegistryKey Key;
 
-        public delegate void FileAddedHandler(RegFiles sender, string fileName);
-        public event FileAddedHandler FileAdded;
+        public delegate void FileAddHandler(RegFiles sender, string fileName);
+        public event FileAddHandler FileAddStart;
+        public event FileAddHandler FileAddEnd;
 
         public delegate void FileRemovedHandler(RegFiles sender, string fileName);
         public event FileRemovedHandler FileRemoved;
+
+        public delegate void FileWriteHandler(RegFiles sender, string fileName, string localPath);
+        public event FileWriteHandler FileWriteStart;
+        public event FileWriteHandler FileWriteEnd;
 
         public string[] GetFileNames() => Key.GetValueNames();
 
@@ -32,13 +37,16 @@ namespace RegistryFileManager
         public void AddFile(string fileName, byte[] buffer)
         {
             Key.SetValue(fileName, buffer);
-            FileAdded?.Invoke(this, fileName);
+
+            FileAddEnd?.Invoke(this, fileName);
         }
 
         public void AddFileAsync(FileInfo localFile)
         {
             new Thread(() =>
             {
+                FileAddStart?.Invoke(this, localFile.Name);
+
                 byte[] buffer = FileToBuffer(localFile);
                 AddFile(localFile.Name, buffer);
             }).Start();
@@ -50,7 +58,14 @@ namespace RegistryFileManager
 
         public void WriteFileAsync(string fileName, string localPath) => new Thread(() => WriteFile(fileName, localPath)).Start();
 
-        public void WriteFile(string fileName, string localPath) => File.WriteAllBytes(localPath, GetFile(fileName));
+        public void WriteFile(string fileName, string localPath)
+        {
+            FileWriteStart?.Invoke(this, fileName, localPath);
+
+            File.WriteAllBytes(localPath, GetFile(fileName));
+
+            FileWriteEnd?.Invoke(this, fileName, localPath);
+        }
 
         public void MoveFileFromRegistry(string fileName, string localPath)
         {
@@ -67,7 +82,9 @@ namespace RegistryFileManager
         public void Start()
         {
             foreach (var file in GetFileNames())
-                FileAdded?.Invoke(this, file);
+            {
+                FileAddEnd?.Invoke(this, file);
+            }
         }
 
         public RegFiles(RegistryKey key) => Key = key;

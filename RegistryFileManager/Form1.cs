@@ -3,9 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -21,11 +23,39 @@ namespace RegistryFileManager
 
             linkLabel1.Text = Files.Key.ToString();
 
-            Files.FileAdded += Files_FileAdded;
+            Files.FileAddStart += Files_FileAddStart;
+            Files.FileAddEnd += Files_FileAddEnd;
             Files.FileRemoved += Files_FileRemoved;
+            Files.FileWriteStart += Files_FileWriteStart;
+            Files.FileWriteEnd += Files_FileWriteEnd;
 
             Files.Start();
         }
+
+        private void Files_FileAddEnd(RegFiles sender, string fileName)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => Files_FileAddEnd(sender, fileName)));
+                return;
+            }
+
+            ListViewItem i = new ListViewItem();
+            i.Text = fileName;
+
+            listView1.Items.Add(i);
+
+            SetCursor(Cursors.Default);
+        }
+
+        private void Files_FileAddStart(RegFiles sender, string fileName)
+            => SetCursor(Cursors.AppStarting);
+
+        private void Files_FileWriteEnd(RegFiles sender, string fileName, string localPath)
+            => SetCursor(Cursors.Default);
+
+        private void Files_FileWriteStart(RegFiles sender, string fileName, string localPath)
+            => SetCursor(Cursors.AppStarting);
 
         private void Files_FileRemoved(RegFiles sender, string fileName)
         {
@@ -45,20 +75,6 @@ namespace RegistryFileManager
                     break;
                 }
             }
-        }
-
-        private void Files_FileAdded(RegFiles sender, string fileName)
-        {
-            if (InvokeRequired)
-            {
-                Invoke(new Action(() => Files_FileAdded(sender, fileName)));
-                return;
-            }
-
-            ListViewItem i = new ListViewItem();
-            i.Text = fileName;
-
-            listView1.Items.Add(i);
         }
 
         private void btnAddFile_Click(object sender, EventArgs e)
@@ -96,6 +112,20 @@ namespace RegistryFileManager
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var item = listView1.SelectedItems[0] as ListViewItem;
+
+            new Thread(() =>
+            {
+                var temp = System.IO.Path.GetTempPath();
+                var path = System.IO.Path.Combine(temp, item.Text);
+
+                Files.WriteFile(item.Text, path);
+
+                SetCursor(Cursors.AppStarting);
+
+                Process.Start(path);
+
+                SetCursor(Cursors.Default);
+            }).Start();
         }
 
         private void copyToToolStripMenuItem_Click(object sender, EventArgs e)
@@ -107,6 +137,17 @@ namespace RegistryFileManager
                 if (s.ShowDialog() == DialogResult.OK)
                     Files.WriteFileAsync(item.Text, s.FileName);
             }
+        }
+
+        public void SetCursor(Cursor c)
+        {
+            if(InvokeRequired)
+            {
+                Invoke(new Action(() => SetCursor(c)));
+                return;
+            }
+
+            this.Cursor = c;
         }
 
         private void moveToToolStripMenuItem_Click(object sender, EventArgs e)
@@ -130,6 +171,12 @@ namespace RegistryFileManager
         {
             Clipboard.SetText(linkLabel1.Text);
             MessageBox.Show("Copied");
+        }
+
+        private void listView1_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (listView1.FocusedItem.Bounds.Contains(e.Location))
+                openToolStripMenuItem_Click(null, null);
         }
     }
 }
