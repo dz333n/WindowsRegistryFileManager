@@ -123,12 +123,7 @@ namespace RegistryFileManager
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var item = listView1.SelectedItems[0] as ListViewItem;
-
-            using (SaveFileDialog s = new SaveFileDialog())
-            {
-                if (s.ShowDialog() == DialogResult.OK)
-                    Files.DeleteFile(item.Text);
-            }
+            Files.DeleteFile(item.Text);
         }
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
