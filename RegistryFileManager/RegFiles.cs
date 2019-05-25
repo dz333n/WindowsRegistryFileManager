@@ -50,6 +50,22 @@ namespace RegistryFileManager
             }).Start();
         }
 
+        public void AddFilesAsync(string[] files)
+        {
+            new Thread(() =>
+            {
+                foreach (var file in files)
+                {
+                    string name = new FileInfo(file).Name;
+
+                    FileAddStart?.Invoke(this, name);
+
+                    byte[] buffer = FileToBuffer(new FileInfo(file));
+                    AddFile(name, buffer);
+                }
+            }).Start();
+        }
+
         public void AddFileAsync(string fileName, byte[] buffer) => new Thread(() => AddFile(fileName, buffer)).Start();
 
         public byte[] FileToBuffer(FileInfo file) => File.ReadAllBytes(file.FullName);

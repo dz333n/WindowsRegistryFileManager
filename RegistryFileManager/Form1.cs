@@ -91,9 +91,10 @@ namespace RegistryFileManager
         {
             using (OpenFileDialog d = new OpenFileDialog())
             {
-                d.Title = "Add file to registry";
+                d.Title = "Add files to registry";
+                d.Multiselect = true;
                 if (d.ShowDialog() == DialogResult.OK) 
-                    Files.AddFileAsync(new System.IO.FileInfo(d.FileName)); 
+                    Files.AddFilesAsync(d.FileNames); 
             }
         }
 
