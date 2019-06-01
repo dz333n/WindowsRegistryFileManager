@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.listView1 = new System.Windows.Forms.ListView();
             this.btnAddFile = new System.Windows.Forms.Button();
             this.btnDelAll = new System.Windows.Forms.Button();
@@ -39,6 +40,11 @@
             this.moveToToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.renameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.propertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.fileContext.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -49,7 +55,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.listView1.Location = new System.Drawing.Point(12, 25);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(612, 308);
+            this.listView1.Size = new System.Drawing.Size(562, 284);
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.List;
@@ -59,18 +65,18 @@
             // btnAddFile
             // 
             this.btnAddFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnAddFile.Location = new System.Drawing.Point(12, 339);
+            this.btnAddFile.Location = new System.Drawing.Point(12, 315);
             this.btnAddFile.Name = "btnAddFile";
-            this.btnAddFile.Size = new System.Drawing.Size(32, 23);
+            this.btnAddFile.Size = new System.Drawing.Size(68, 23);
             this.btnAddFile.TabIndex = 1;
-            this.btnAddFile.Text = "+";
+            this.btnAddFile.Text = "Add File";
             this.btnAddFile.UseVisualStyleBackColor = true;
             this.btnAddFile.Click += new System.EventHandler(this.btnAddFile_Click);
             // 
             // btnDelAll
             // 
             this.btnDelAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnDelAll.Location = new System.Drawing.Point(50, 339);
+            this.btnDelAll.Location = new System.Drawing.Point(86, 315);
             this.btnDelAll.Name = "btnDelAll";
             this.btnDelAll.Size = new System.Drawing.Size(78, 23);
             this.btnDelAll.TabIndex = 2;
@@ -81,7 +87,7 @@
             // btnUpdate
             // 
             this.btnUpdate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnUpdate.Location = new System.Drawing.Point(546, 339);
+            this.btnUpdate.Location = new System.Drawing.Point(496, 315);
             this.btnUpdate.Name = "btnUpdate";
             this.btnUpdate.Size = new System.Drawing.Size(78, 23);
             this.btnUpdate.TabIndex = 3;
@@ -93,37 +99,42 @@
             // 
             this.fileContext.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openToolStripMenuItem,
+            this.toolStripSeparator1,
             this.copyToToolStripMenuItem,
             this.moveToToolStripMenuItem,
-            this.deleteToolStripMenuItem});
+            this.toolStripSeparator2,
+            this.renameToolStripMenuItem,
+            this.deleteToolStripMenuItem,
+            this.toolStripSeparator3,
+            this.propertiesToolStripMenuItem});
             this.fileContext.Name = "fileContext";
-            this.fileContext.Size = new System.Drawing.Size(130, 92);
+            this.fileContext.Size = new System.Drawing.Size(130, 154);
             // 
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
             this.openToolStripMenuItem.Text = "Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
             // copyToToolStripMenuItem
             // 
             this.copyToToolStripMenuItem.Name = "copyToToolStripMenuItem";
-            this.copyToToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.copyToToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
             this.copyToToolStripMenuItem.Text = "Copy To...";
             this.copyToToolStripMenuItem.Click += new System.EventHandler(this.copyToToolStripMenuItem_Click);
             // 
             // moveToToolStripMenuItem
             // 
             this.moveToToolStripMenuItem.Name = "moveToToolStripMenuItem";
-            this.moveToToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.moveToToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
             this.moveToToolStripMenuItem.Text = "Move To...";
             this.moveToToolStripMenuItem.Click += new System.EventHandler(this.moveToToolStripMenuItem_Click);
             // 
             // deleteToolStripMenuItem
             // 
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
             this.deleteToolStripMenuItem.Text = "Delete";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
             // 
@@ -138,18 +149,49 @@
             this.linkLabel1.Text = "linkLabel1";
             this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
             // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(126, 6);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(126, 6);
+            // 
+            // renameToolStripMenuItem
+            // 
+            this.renameToolStripMenuItem.Name = "renameToolStripMenuItem";
+            this.renameToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
+            this.renameToolStripMenuItem.Text = "Rename";
+            this.renameToolStripMenuItem.Click += new System.EventHandler(this.renameToolStripMenuItem_Click);
+            // 
+            // propertiesToolStripMenuItem
+            // 
+            this.propertiesToolStripMenuItem.Enabled = false;
+            this.propertiesToolStripMenuItem.Name = "propertiesToolStripMenuItem";
+            this.propertiesToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
+            this.propertiesToolStripMenuItem.Text = "Properties";
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(126, 6);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(636, 374);
+            this.ClientSize = new System.Drawing.Size(586, 350);
             this.Controls.Add(this.linkLabel1);
             this.Controls.Add(this.btnUpdate);
             this.Controls.Add(this.btnDelAll);
             this.Controls.Add(this.btnAddFile);
             this.Controls.Add(this.listView1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Registry File Manager";
             this.fileContext.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -168,6 +210,11 @@
         private System.Windows.Forms.ToolStripMenuItem moveToToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
         private System.Windows.Forms.LinkLabel linkLabel1;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripMenuItem renameToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripMenuItem propertiesToolStripMenuItem;
     }
 }
 

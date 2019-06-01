@@ -33,60 +33,107 @@ namespace RegistryFileManager
 
             linkLabel1.Text = Files.Key.ToString();
 
-            Files.FileAddStart += Files_FileAddStart;
+            // Events
+
             Files.FileAddEnd += Files_FileAddEnd;
-            Files.FileRemoved += Files_FileRemoved;
-            Files.FileWriteStart += Files_FileWriteStart;
-            Files.FileWriteEnd += Files_FileWriteEnd;
+            Files.FileAddStart += Files_FileAddStart;
+
+            Files.FileRemoveBegin += Files_FileRemoveBegin;
+            Files.FileRemoveEnd += Files_FileRemoveEnd;
+
+            Files.FileCopyRegToLocalBegin += Files_FileCopyRegToLocalBegin;
+            Files.FileCopyRegToLocalEnd += Files_FileCopyRegToLocalEnd;
+
+            Files.FileMoveRegToLocalBegin += Files_FileMoveRegToLocalBegin;
+            Files.FileMoveRegToLocalEnd += Files_FileMoveRegToLocalEnd;
 
             Files.Start();
         }
 
-        private void Files_FileAddEnd(RegFiles sender, string fileName)
+        private void Files_FileMoveRegToLocalEnd(RegFiles sender, string fileName, string localPath, Exception ex = null)
+            => BasicEndHandler(ex);
+
+        private void Files_FileMoveRegToLocalBegin(RegFiles sender, string fileName, string localPath)
+            => BasicBeginHandler(true);
+
+        private void Files_FileCopyRegToLocalEnd(RegFiles sender, string fileName, string localPath, Exception ex = null)
+            => BasicEndHandler(ex);
+
+        private void Files_FileCopyRegToLocalBegin(RegFiles sender, string fileName, string localPath)
+            => BasicBeginHandler(true);
+
+        private void Files_FileRemoveEnd(RegFiles sender, string fileName, Exception exception = null)
         {
             if (InvokeRequired)
             {
-                Invoke(new Action(() => Files_FileAddEnd(sender, fileName)));
+                Invoke(new Action(() => Files_FileRemoveEnd(sender, fileName, exception)));
                 return;
             }
 
-            ListViewItem i = new ListViewItem();
-            i.Text = fileName;
+            BasicEndHandler(exception);
 
-            listView1.Items.Add(i);
+            if (exception == null)
+                foreach (var thing in listView1.Items)
+                {
+                    var item = thing as ListViewItem;
+
+                    if (item.Text == fileName)
+                    {
+                        listView1.Items.Remove(item);
+                        break;
+                    }
+                }
+        }
+
+        private void Files_FileRemoveBegin(RegFiles sender, string fileName)
+            => BasicBeginHandler();
+
+        private void Files_FileAddEnd(RegFiles sender, string fileName, Exception ex)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => Files_FileAddEnd(sender, fileName, ex)));
+                return;
+            }
+
+            BasicEndHandler(ex);
+
+            if (ex == null)
+            {
+                ListViewItem i = new ListViewItem();
+                i.Text = fileName;
+
+                listView1.Items.Add(i);
+            }
+        }
+
+        private void BasicBeginHandler(bool enabled = false)
+        {
+            SetCursor(Cursors.AppStarting);
+            // this.Enabled = enabled;
+        }
+
+        private void BasicEndHandler(params object[] things)
+        {
+            if (InvokeRequired)
+            {
+                this.Invoke(new Action(() => BasicEndHandler(things)));
+                return;
+            }
 
             SetCursor(Cursors.Default);
+            // this.Enabled = true;
+
+            foreach (var param in things)
+            {
+                if (param is Exception && param != null)
+                    MessageBox.Show("Error:\r\n" + param.ToString());
+            }
         }
 
         private void Files_FileAddStart(RegFiles sender, string fileName)
             => SetCursor(Cursors.AppStarting);
-
-        private void Files_FileWriteEnd(RegFiles sender, string fileName, string localPath)
-            => SetCursor(Cursors.Default);
-
-        private void Files_FileWriteStart(RegFiles sender, string fileName, string localPath)
-            => SetCursor(Cursors.AppStarting);
-
-        private void Files_FileRemoved(RegFiles sender, string fileName)
-        {
-            if (InvokeRequired)
-            {
-                Invoke(new Action(() => Files_FileRemoved(sender, fileName)));
-                return;
-            }
-
-            foreach (var thing in listView1.Items)
-            {
-                var item = thing as ListViewItem;
-
-                if (item.Text == fileName)
-                {
-                    listView1.Items.Remove(item);
-                    break;
-                }
-            }
-        }
-
+        
         private void btnAddFile_Click(object sender, EventArgs e)
         {
             using (OpenFileDialog d = new OpenFileDialog())
@@ -100,7 +147,7 @@ namespace RegistryFileManager
 
         private void btnDelAll_Click(object sender, EventArgs e)
         {
-            Files.DeleteAllFiles();
+            Files.DeleteAllFilesAsync();
         }
 
         private void btnUpdate_Click(object sender, EventArgs e)
@@ -128,14 +175,22 @@ namespace RegistryFileManager
             {
                 var temp = System.IO.Path.GetTempPath();
                 var path = System.IO.Path.Combine(temp, item.Text);
+                try
+                {
+                    Files.CopyFileFromRegToLocal(item.Text, path);
 
-                Files.WriteFile(item.Text, path);
+                    SetCursor(Cursors.AppStarting);
 
-                SetCursor(Cursors.AppStarting);
-
-                Process.Start(path);
-
-                SetCursor(Cursors.Default);
+                    Process.Start(path);
+                }
+                catch (Exception ex)
+                {
+                    BasicEndHandler(ex);
+                }
+                finally
+                {
+                    SetCursor(Cursors.Default);
+                }
             }).Start();
         }
 
@@ -146,7 +201,7 @@ namespace RegistryFileManager
             using (SaveFileDialog s = new SaveFileDialog())
             {
                 if (s.ShowDialog() == DialogResult.OK)
-                    Files.WriteFileAsync(item.Text, s.FileName);
+                    Files.CopyFileFromRegToLocalAsync(item.Text, s.FileName);
             }
         }
 
@@ -168,14 +223,14 @@ namespace RegistryFileManager
             using (SaveFileDialog s = new SaveFileDialog())
             {
                 if (s.ShowDialog() == DialogResult.OK)
-                    Files.MoveFileFromRegistry(item.Text, s.FileName);
+                    Files.MoveFileFromRegToLocalAsync(item.Text, s.FileName);
             }
         }
 
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var item = listView1.SelectedItems[0] as ListViewItem;
-            Files.DeleteFile(item.Text);
+            Files.DeleteFileAsync(item.Text);
         }
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -188,6 +243,13 @@ namespace RegistryFileManager
         {
             if (listView1.FocusedItem.Bounds.Contains(e.Location))
                 openToolStripMenuItem_Click(null, null);
+        }
+
+        private void renameToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var item = listView1.SelectedItems[0] as ListViewItem;
+
+            new FileRenameDialog(Files, item.Text).ShowDialog();
         }
     }
 }
