@@ -1,5 +1,6 @@
 # RegistryFileManager
 - supports Windows 98/2000
+- requires .NET Framework 2.0
 
 Allows to add/move/remove real files to/from Windows Registry
 
