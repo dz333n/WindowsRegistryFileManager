@@ -7,14 +7,14 @@ using System.Threading;
 
 namespace RegistryFileManager
 {
-    public class RegFiles
+    public class RegistryFileManager
     {
         public RegistryKey Key;
 
         // Default handlers
 
-        public delegate void FileOperationBeginHandler(RegFiles sender, string fileName);
-        public delegate void FileOperationEndHandler(RegFiles sender, string fileName, Exception exception = null);
+        public delegate void FileOperationBeginHandler(RegistryFileManager sender, string fileName);
+        public delegate void FileOperationEndHandler(RegistryFileManager sender, string fileName, Exception exception = null);
         
         public event FileOperationBeginHandler FileAddStart;
         public event FileOperationEndHandler FileAddEnd;
@@ -24,8 +24,8 @@ namespace RegistryFileManager
 
         // Write handlers
 
-        public delegate void FileWriteBeginHandler(RegFiles sender, string fileName, string localPath);
-        public delegate void FileWriteEndfHandler(RegFiles sender, string fileName, string localPath, Exception ex = null);
+        public delegate void FileWriteBeginHandler(RegistryFileManager sender, string fileName, string localPath);
+        public delegate void FileWriteEndfHandler(RegistryFileManager sender, string fileName, string localPath, Exception ex = null);
 
         public event FileWriteBeginHandler FileCopyRegToLocalBegin;
         public event FileWriteEndfHandler FileCopyRegToLocalEnd;
@@ -218,6 +218,6 @@ namespace RegistryFileManager
             }
         }
 
-        public RegFiles(RegistryKey key) => Key = key;
+        public RegistryFileManager(RegistryKey key) => Key = key;
     }
 }

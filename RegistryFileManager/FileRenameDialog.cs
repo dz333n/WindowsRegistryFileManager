@@ -10,10 +10,10 @@ namespace RegistryFileManager
 {
     public partial class FileRenameDialog : Form
     {
-        RegFiles Files;
+        RegistryFileManager Files;
         string FileName;
 
-        public FileRenameDialog(RegFiles files, string fileName)
+        public FileRenameDialog(RegistryFileManager files, string fileName)
         {
             InitializeComponent();
 
