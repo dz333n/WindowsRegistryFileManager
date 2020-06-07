@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace RegistryFileManager
 {
-    public partial class Form1 : Form
+    public partial class MainForm : Form
     {
         #region NET20_Things
         public delegate void Action();
@@ -25,44 +25,44 @@ namespace RegistryFileManager
         public delegate TResult Func<T1, T2, T3, T4, TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4);
         #endregion
 
-        public RegFiles Files = new RegFiles(Registry.CurrentUser.CreateSubKey("Software").CreateSubKey("Registry File Manager"));
+        private RegistryFileManager regFiles = new RegistryFileManager(Registry.CurrentUser.CreateSubKey("Software").CreateSubKey("Registry File Manager"));
 
-        public Form1()
+        public MainForm()
         {
             InitializeComponent();
 
-            linkLabel1.Text = Files.Key.ToString();
+            linkLabel1.Text = regFiles.Key.ToString();
 
             // Events
 
-            Files.FileAddEnd += Files_FileAddEnd;
-            Files.FileAddStart += Files_FileAddStart;
+            regFiles.FileAddEnd += Files_FileAddEnd;
+            regFiles.FileAddStart += Files_FileAddStart;
 
-            Files.FileRemoveBegin += Files_FileRemoveBegin;
-            Files.FileRemoveEnd += Files_FileRemoveEnd;
+            regFiles.FileRemoveBegin += Files_FileRemoveBegin;
+            regFiles.FileRemoveEnd += Files_FileRemoveEnd;
 
-            Files.FileCopyRegToLocalBegin += Files_FileCopyRegToLocalBegin;
-            Files.FileCopyRegToLocalEnd += Files_FileCopyRegToLocalEnd;
+            regFiles.FileCopyRegToLocalBegin += Files_FileCopyRegToLocalBegin;
+            regFiles.FileCopyRegToLocalEnd += Files_FileCopyRegToLocalEnd;
 
-            Files.FileMoveRegToLocalBegin += Files_FileMoveRegToLocalBegin;
-            Files.FileMoveRegToLocalEnd += Files_FileMoveRegToLocalEnd;
+            regFiles.FileMoveRegToLocalBegin += Files_FileMoveRegToLocalBegin;
+            regFiles.FileMoveRegToLocalEnd += Files_FileMoveRegToLocalEnd;
 
-            Files.Start();
+            regFiles.Start();
         }
 
-        private void Files_FileMoveRegToLocalEnd(RegFiles sender, string fileName, string localPath, Exception ex = null)
+        private void Files_FileMoveRegToLocalEnd(RegistryFileManager sender, string fileName, string localPath, Exception ex = null)
             => BasicEndHandler(ex);
 
-        private void Files_FileMoveRegToLocalBegin(RegFiles sender, string fileName, string localPath)
+        private void Files_FileMoveRegToLocalBegin(RegistryFileManager sender, string fileName, string localPath)
             => BasicBeginHandler(true);
 
-        private void Files_FileCopyRegToLocalEnd(RegFiles sender, string fileName, string localPath, Exception ex = null)
+        private void Files_FileCopyRegToLocalEnd(RegistryFileManager sender, string fileName, string localPath, Exception ex = null)
             => BasicEndHandler(ex);
 
-        private void Files_FileCopyRegToLocalBegin(RegFiles sender, string fileName, string localPath)
+        private void Files_FileCopyRegToLocalBegin(RegistryFileManager sender, string fileName, string localPath)
             => BasicBeginHandler(true);
 
-        private void Files_FileRemoveEnd(RegFiles sender, string fileName, Exception exception = null)
+        private void Files_FileRemoveEnd(RegistryFileManager sender, string fileName, Exception exception = null)
         {
             if (InvokeRequired)
             {
@@ -85,10 +85,10 @@ namespace RegistryFileManager
                 }
         }
 
-        private void Files_FileRemoveBegin(RegFiles sender, string fileName)
+        private void Files_FileRemoveBegin(RegistryFileManager sender, string fileName)
             => BasicBeginHandler();
 
-        private void Files_FileAddEnd(RegFiles sender, string fileName, Exception ex)
+        private void Files_FileAddEnd(RegistryFileManager sender, string fileName, Exception ex)
         {
             if (InvokeRequired)
             {
@@ -131,7 +131,7 @@ namespace RegistryFileManager
             }
         }
 
-        private void Files_FileAddStart(RegFiles sender, string fileName)
+        private void Files_FileAddStart(RegistryFileManager sender, string fileName)
             => SetCursor(Cursors.AppStarting);
         
         private void btnAddFile_Click(object sender, EventArgs e)
@@ -141,19 +141,19 @@ namespace RegistryFileManager
                 d.Title = "Add files to registry";
                 d.Multiselect = true;
                 if (d.ShowDialog() == DialogResult.OK) 
-                    Files.AddFilesAsync(d.FileNames); 
+                    regFiles.AddFilesAsync(d.FileNames); 
             }
         }
 
         private void btnDelAll_Click(object sender, EventArgs e)
         {
-            Files.DeleteAllFilesAsync();
+            regFiles.DeleteAllFilesAsync();
         }
 
         private void btnUpdate_Click(object sender, EventArgs e)
         {
             listView1.Items.Clear();
-            Files.Start();
+            regFiles.Start();
         }
 
         private void listView1_MouseClick(object sender, MouseEventArgs e)
@@ -177,7 +177,7 @@ namespace RegistryFileManager
                 var path = System.IO.Path.Combine(temp, item.Text);
                 try
                 {
-                    Files.CopyFileFromRegToLocal(item.Text, path);
+                    regFiles.CopyFileFromRegToLocal(item.Text, path);
 
                     SetCursor(Cursors.AppStarting);
 
@@ -201,7 +201,7 @@ namespace RegistryFileManager
             using (SaveFileDialog s = new SaveFileDialog())
             {
                 if (s.ShowDialog() == DialogResult.OK)
-                    Files.CopyFileFromRegToLocalAsync(item.Text, s.FileName);
+                    regFiles.CopyFileFromRegToLocalAsync(item.Text, s.FileName);
             }
         }
 
@@ -223,14 +223,14 @@ namespace RegistryFileManager
             using (SaveFileDialog s = new SaveFileDialog())
             {
                 if (s.ShowDialog() == DialogResult.OK)
-                    Files.MoveFileFromRegToLocalAsync(item.Text, s.FileName);
+                    regFiles.MoveFileFromRegToLocalAsync(item.Text, s.FileName);
             }
         }
 
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var item = listView1.SelectedItems[0] as ListViewItem;
-            Files.DeleteFileAsync(item.Text);
+            regFiles.DeleteFileAsync(item.Text);
         }
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -249,7 +249,7 @@ namespace RegistryFileManager
         {
             var item = listView1.SelectedItems[0] as ListViewItem;
 
-            new FileRenameDialog(Files, item.Text).ShowDialog();
+            new FileRenameDialog(regFiles, item.Text).ShowDialog();
         }
     }
 }
