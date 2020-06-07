@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <OutputType>WinExe</OutputType>
+    <ApplicationIcon>Resources\file.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
